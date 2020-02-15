@@ -1,0 +1,8 @@
+cradle:
+  cabal:
+    - path: "./tt1"
+      component: "lib:tt1"
+    - path: "./tta"
+      component: "tta"
+    - path: "./tt2"
+      component: "lib:tt2"
