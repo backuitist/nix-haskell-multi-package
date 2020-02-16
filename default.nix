@@ -1,7 +1,7 @@
-{forShell ? false}:
+{forShell ? false, ghcVersion ? "ghc865" }:
 let
   pkgs = import ./nixpkgs.nix;  
-  ghc = pkgs.haskell.packages.ghc865;
+  ghc = pkgs.haskell.packages."${ghcVersion}";
   targets = import ./cabal.nix;
   haskellPackages = ghc.extend (pkgs.lib.composeExtensions
       (self: super: pkgs.haskell.lib.packageSourceOverrides (targets // {
@@ -20,7 +20,11 @@ let
   );
   buildSet = pkgs.lib.foldl (ps: p: ps // { ${p.pname} = p; }) {} packages;
   packages = map (t: haskellPackages.${t} ) (builtins.attrNames targets);
-  tools = [ pkgs.pkgconfig ];
+
+  all-hies = import (fetchTarball "https://github.com/infinisil/all-hies/tarball/master") {};
+  hie = all-hies.versions."${ghcVersion}";
+
+  tools = [ pkgs.pkgconfig hie ];
 in
   if forShell
   then haskellPackages.shellFor { packages = _: packages; buildInputs = tools; }
